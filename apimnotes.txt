@@ -1,0 +1,61 @@
+$dnsname='api.lapimtest.com'
+$pwd="......"
+$cert = New-SelfSignedCertificate -CertStoreLocation Cert:\localmachine\my -dnsname $dnsname
+$password = ConvertTo-SecureString -String $pwd -Force -AsPlainText
+Get-ChildItem -Path ("Cert:\LocalMachine\my\" + $cert.Thumbprint) | Export-PfxCertificate -FilePath appgw.pfx -Password $password
+copy appgw.pfx to gateway\certs
+
+
+make a copy of parameters.json to localparam.json
+set appropriate values 
+app gateway fqdn to dnsname above
+certificatePassword should be $pwd
+
+        "appGatewayFqdn" :{ 
+            "value": "api.contoso.com"
+        },
+        "appGatewayCertType" :{
+            "value": "selfsigned"
+        },
+        "certificatePassword" :{
+            "value": "...."
+        }
+
+
+
+
+$LOCATION = "southafricanorth"
+$BICEP_FILE="main.bicep"
+$deploymentname='testapim2'
+az deployment sub  create --name $deploymentname  --template-file $BICEP_FILE   --parameters localparam.json --location $LOCATION -o json
+
+// after deployment 
+// to test the APIM 
+// make sure to add ip address to hosts files
+
+from https://www.tutorialspoint.com/how-to-add-the-entry-in-the-windows-host-file-using-powershell
+$file = "C:\Windows\System32\drivers\etc\hosts"
+$hostfile = Get-Content $file
+$hostfile += "8.8.8.8   Google.com"
+Set-Content -Path $file -Value $hostfile -Force
+
+
+
+// set proper values 
+$rg='rg-apim-ahmsWL4-dev-southafricanorth-001'
+$svcName='apim-ahmsWL4-dev-southafricanorth-001'
+
+
+$path='conference'
+$specUrl='https://conferenceapi.azurewebsites.net?format=json'
+
+az apim api import -g $rg --service-name $svcName --path $path --specification-url $specUrl --specification-format OpenApiJson --subscription-required false
+$geturl="https://$dnsname/conference/sessions"
+curl -k $geturl
+
+
+
+
+
+Invoke-WebRequest -URI https://api.contoso.com/conference/sessions -Method Get 
+Invoke-RestMethod -Uri https://api.contoso.com/conference/sessions -SkipCertificateCheck
