@@ -1,3 +1,9 @@
+clone this repo
+
+change into repo and then into bicep directory
+
+set variables  to create self signed cert
+
 $dnsname='api.lapimtest.com'
 $pwd="......"
 $cert = New-SelfSignedCertificate -CertStoreLocation Cert:\localmachine\my -dnsname $dnsname
@@ -22,6 +28,8 @@ certificatePassword should be $pwd
         }
 
 
+// get ready to deploy
+// set variables
 
 
 $LOCATION = "southafricanorth"
@@ -31,19 +39,19 @@ az deployment sub  create --name $deploymentname  --template-file $BICEP_FILE   
 
 // after deployment 
 // to test the APIM 
-// make sure to add ip address to hosts files
+// make sure to add ip address to hosts files with dnsname above
 
 from https://www.tutorialspoint.com/how-to-add-the-entry-in-the-windows-host-file-using-powershell
 $file = "C:\Windows\System32\drivers\etc\hosts"
 $hostfile = Get-Content $file
-$hostfile += "8.8.8.8   Google.com"
+$hostfile += "appgatewaypublicip  $dnsname"
 Set-Content -Path $file -Value $hostfile -Force
 
 
 
 // set proper values 
-$rg='rg-apim-ahmsWL4-dev-southafricanorth-001'
-$svcName='apim-ahmsWL4-dev-southafricanorth-001'
+$rg='rg-apim-apimwl-dev-southafricanorth-001'
+$svcName='apim-apimwl-dev-southafricanorth-001'
 
 
 $path='conference'
