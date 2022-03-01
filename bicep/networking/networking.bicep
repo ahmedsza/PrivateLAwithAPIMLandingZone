@@ -75,6 +75,7 @@ var jumpBoxSNNSG = 'nsg-jbox-${workloadName}-${deploymentEnvironment}-${location
 var appGatewaySNNSG = 'nsg-apgw-${workloadName}-${deploymentEnvironment}-${location}'
 var privateEndpointSNNSG = 'nsg-prep-${workloadName}-${deploymentEnvironment}-${location}'
 var backEndSNNSG = 'nsg-bcke-${workloadName}-${deploymentEnvironment}-${location}'
+var vnetSNNSG = 'nsg-vnet-${workloadName}-${deploymentEnvironment}-${location}'
 var apimSNNSG = 'nsg-apim-${workloadName}-${deploymentEnvironment}-${location}'
 
 var publicIPAddressName = 'pip-apimcs-${workloadName}-${deploymentEnvironment}-${location}' // 'publicIp'
@@ -166,6 +167,9 @@ resource vnetApimCs 'Microsoft.Network/virtualNetworks@2021-02-01' = {
       {
         name: vnetSubnetName
         properties: {
+          networkSecurityGroup: {
+            id: vnetNSG.id
+          }
           addressPrefix: vnetIntegrationAddressPrefix
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
@@ -468,6 +472,7 @@ resource appGatewayNSG 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
     ]
   }
 }
+
 resource privateEndpointNSG 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
   name: privateEndpointSNNSG
   location: location
@@ -511,6 +516,30 @@ resource backEndNSG 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
     ]
   }
 }
+
+resource vnetNSG 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
+  name: vnetSNNSG
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'default-allow-rdp'
+        properties: {
+          priority: 1000
+          sourceAddressPrefix: '*'
+          protocol: 'Tcp'
+          destinationPortRange: '3389'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+    ]
+  }
+}
+
+
 resource apimNSG 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
   name: apimSNNSG
   location: location

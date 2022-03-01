@@ -2,20 +2,27 @@ clone this repo
 
 change into repo and then into bicep directory
 
-set variables  to create self signed cert
+make sure az cli and bicep is installed
+https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli 
+have bicep installed -- version 0.4.1008 (issue with latest version)
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install
+
+set variables  to create self signed cert 
+- this was done in powershell
 
 $dnsname='api.lapimtest.com'
 $pwd="......"
 $cert = New-SelfSignedCertificate -CertStoreLocation Cert:\localmachine\my -dnsname $dnsname
 $password = ConvertTo-SecureString -String $pwd -Force -AsPlainText
 Get-ChildItem -Path ("Cert:\LocalMachine\my\" + $cert.Thumbprint) | Export-PfxCertificate -FilePath appgw.pfx -Password $password
+
 copy appgw.pfx to gateway\certs
 
 
 make a copy of parameters.json to localparam.json
 set appropriate values 
 app gateway fqdn to dnsname above
-certificatePassword should be $pwd
+certificatePassword should be value of $pwd
 
         "appGatewayFqdn" :{ 
             "value": "api.contoso.com"
@@ -34,9 +41,11 @@ certificatePassword should be $pwd
 
 $LOCATION = "southafricanorth"
 $BICEP_FILE="main.bicep"
-$deploymentname='testapim2'
+$deploymentname='testapim6'
 az deployment sub  create --name $deploymentname  --template-file $BICEP_FILE   --parameters localparam.json --location $LOCATION -o json
 
+
+az deployment sub  create --name $deploymentname  --template-file $BICEP_FILE   --parameters localparamgh.json --location $LOCATION -o json
 // after deployment 
 // to test the APIM 
 // make sure to add ip address to hosts files with dnsname above
@@ -50,8 +59,8 @@ Set-Content -Path $file -Value $hostfile -Force
 
 
 // set proper values 
-$rg='rg-apim-apimwl-dev-southafricanorth-001'
-$svcName='apim-apimwl-dev-southafricanorth-001'
+$rg='rg-apim-ahmsWL6-dev-southafricanorth-001'
+$svcName='apim-ahmsWL6-dev-southafricanorth-001'
 
 
 $path='conference'
@@ -62,8 +71,3 @@ $geturl="https://$dnsname/conference/sessions"
 curl -k $geturl
 
 
-
-
-
-Invoke-WebRequest -URI https://api.contoso.com/conference/sessions -Method Get 
-Invoke-RestMethod -Uri https://api.contoso.com/conference/sessions -SkipCertificateCheck

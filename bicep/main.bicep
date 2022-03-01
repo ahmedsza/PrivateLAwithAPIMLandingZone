@@ -114,6 +114,21 @@ module logicapp './logicapps/logicapp.bicep' = {
   }
 }
 
+module servicebus './servicebus/sb.bicep' = {
+  name: 'servicebus'
+  scope: resourceGroup(backendRG.name)
+  params: {
+    workloadName: workloadName
+    location: location
+    deploymentEnvironment: environment
+    BackEndSubnetId: networking.outputs.backEndSubnetid
+    vnetId: networking.outputs.vnetId
+    vnetIntegrationSubnetId: networking.outputs.vnetSubnetid  
+    virtualNetworkName: networking.outputs.apimCSVNetName
+    subnetName: networking.outputs.backEndSubnetName
+  }
+}
+
 var jumpboxSubnetId= networking.outputs.jumpBoxSubnetid
 var CICDAgentSubnetId = networking.outputs.CICDAgentSubnetId
 
