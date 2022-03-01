@@ -1,4 +1,4 @@
-clone this repo
+clone this repo to your machine
 
 change into repo and then into bicep directory
 
