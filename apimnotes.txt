@@ -10,7 +10,7 @@ https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install
 set variables  to create self signed cert 
 - this was done in powershell
 
-$dnsname='api.lapimtest.com'
+$dnsname='api.apimtest.com'
 $pwd="......"
 $cert = New-SelfSignedCertificate -CertStoreLocation Cert:\localmachine\my -dnsname $dnsname
 $password = ConvertTo-SecureString -String $pwd -Force -AsPlainText
