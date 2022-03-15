@@ -70,4 +70,16 @@ az apim api import -g $rg --service-name $svcName --path $path --specification-u
 $geturl="https://$dnsname/conference/sessions"
 curl -k $geturl
 
+curl -k https://api.ahmed-domain.com/conference/sessions
+
+
+
+$rg='rg-apim-ahmsWL6-dev-southafricanorth-001'
+$svcName='apim-ahmsWL6-dev-southafricanorth-001'
+
+
+$path='external/conference'
+$specUrl='https://conferenceapi.azurewebsites.net?format=json'
+
+az apim api import -g $rg  --api-id 'externalconf' --display-name 'external conf' --service-name $svcName --path $path --specification-url $specUrl --specification-format OpenApiJson --subscription-required false
 

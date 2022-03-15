@@ -133,6 +133,12 @@ resource appGatewayName_resource 'Microsoft.Network/applicationGateways@2019-09-
           ]
         }
       }
+      {
+        name: 'sinkpool'
+        properties: {
+          backendAddresses: []
+        }
+      }
     ]
     backendHttpSettingsCollection: [
       {
@@ -194,21 +200,47 @@ resource appGatewayName_resource 'Microsoft.Network/applicationGateways@2019-09-
         }
       }
     ]
-    urlPathMaps: []
+    urlPathMaps: [
+      {
+        name: 'apim'
+        properties: {
+          defaultBackendAddressPool: {
+            id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendAddressPools/sinkpool'
+          }
+          defaultBackendHttpSettings: {
+            id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendHttpSettingsCollection/https'
+          }
+          pathRules: [
+            {
+              name: 'external'
+              properties: {
+                paths: [
+                  '/external/*'
+                ]
+                backendAddressPool: {
+                  id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendAddressPools/apim'
+                }
+                backendHttpSettings: {
+                  id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendHttpSettingsCollection/https'
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
     requestRoutingRules: [
       {
         name: 'apim'
         properties: {
-          ruleType: 'Basic'
+          ruleType: 'PathBasedRouting'
           httpListener: {
             id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/httpListeners/https'
           }
-          backendAddressPool: {
-            id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendAddressPools/apim'
+          urlPathMap: {
+            id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/urlPathMaps/apim'
           }
-          backendHttpSettings: {
-            id: '${resourceId('Microsoft.Network/applicationGateways', appGatewayName)}/backendHttpSettingsCollection/https'
-          }
+          
         }
       }
     ]
@@ -251,3 +283,4 @@ resource appGatewayName_resource 'Microsoft.Network/applicationGateways@2019-09-
     }
   }
 }
+
